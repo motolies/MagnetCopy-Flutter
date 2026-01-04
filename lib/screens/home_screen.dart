@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 import '../providers/magnet_provider.dart';
@@ -13,17 +12,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WindowListener {
-  static const _urlHandlerChannel = MethodChannel('magnet_copy/url_handler');
-
-  bool _isAlwaysOnTop = false;
-  bool _isMagnetRegistered = false;
+  bool _isAlwaysOnTop = true;
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     windowManager.addListener(this);
-    _checkMagnetRegistration();
+    _initAlwaysOnTop();
+  }
+
+  Future<void> _initAlwaysOnTop() async {
+    await windowManager.setAlwaysOnTop(true);
   }
 
   @override
@@ -31,34 +31,6 @@ class _HomeScreenState extends State<HomeScreen> with WindowListener {
     windowManager.removeListener(this);
     _scrollController.dispose();
     super.dispose();
-  }
-
-  Future<void> _checkMagnetRegistration() async {
-    try {
-      final isRegistered = await _urlHandlerChannel.invokeMethod<bool>('isDefaultHandler');
-      setState(() {
-        _isMagnetRegistered = isRegistered ?? false;
-      });
-    } catch (e) {
-      debugPrint('Failed to check magnet registration: $e');
-    }
-  }
-
-  Future<void> _toggleMagnetRegistration() async {
-    try {
-      await _urlHandlerChannel.invokeMethod('registerAsDefaultHandler');
-      await _checkMagnetRegistration();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Magnet 핸들러로 등록되었습니다'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (e) {
-      debugPrint('Failed to register magnet handler: $e');
-    }
   }
 
   Future<void> _toggleAlwaysOnTop() async {
@@ -139,12 +111,6 @@ class _HomeScreenState extends State<HomeScreen> with WindowListener {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Checkbox(
-                value: _isMagnetRegistered,
-                onChanged: (_) => _toggleMagnetRegistration(),
-              ),
-              const Text('Magnet 등록'),
-              const SizedBox(width: 16),
               Checkbox(
                 value: _isAlwaysOnTop,
                 onChanged: (_) => _toggleAlwaysOnTop(),
