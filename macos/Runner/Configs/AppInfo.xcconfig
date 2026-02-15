@@ -8,7 +8,7 @@
 PRODUCT_NAME = magnet_copy
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.magnetCopy
+PRODUCT_BUNDLE_IDENTIFIER = kr.hvy.magnetcopy
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 kr.hvy. All rights reserved.
